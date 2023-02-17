@@ -5,7 +5,7 @@
 //  Created by Trịnh Xuân Minh on 17/02/2023.
 //
 
-import Foundation
+import UIKit
 import RxSwift
 import RxCocoa
 
@@ -32,7 +32,11 @@ public struct PlayerManager {
       return
     }
     listServerUseCase.loadMovieServer(name: name, tmdbId: tmdbId).bind(onNext: { (allowShow, listServerViewModel) in
-      print(allowShow, listServerViewModel)
+      guard allowShow else {
+        limitHandler?()
+        return
+      }
+      play(servers: listServerViewModel)
     }).disposed(by: self.disposeBag)
   }
   
@@ -46,7 +50,25 @@ public struct PlayerManager {
       return
     }
     listServerUseCase.loadTVServer(name: name, tmdbId: tmdbId, season: season, episode: episode).bind(onNext: { (allowShow, listServerViewModel) in
-      print(allowShow, listServerViewModel)
+      guard allowShow else {
+        limitHandler?()
+        return
+      }
+      play(servers: listServerViewModel)
     }).disposed(by: self.disposeBag)
+  }
+}
+
+extension PlayerManager {
+  private func play(servers: [ServerViewModelProtocol]) {
+    guard let topVC = UIApplication.topStackViewController() else {
+        return
+    }
+    let playerView = PlayerView()
+    playerView.frame = topVC.view.frame
+    let listServerViewModel = ListServerViewModel()
+    listServerViewModel.setListServer(servers)
+    playerView.setViewModel(listServerViewModel)
+    topVC.view.addSubview(playerView)
   }
 }
