@@ -45,5 +45,8 @@ public struct PlayerManager {
     guard domain != nil else {
       return
     }
+    listServerUseCase.loadTVServer(name: name, tmdbId: tmdbId, season: season, episode: episode).bind(onNext: { (allowShow, listServerViewModel) in
+      print(allowShow, listServerViewModel)
+    }).disposed(by: self.disposeBag)
   }
 }
