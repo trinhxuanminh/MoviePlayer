@@ -9,14 +9,15 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-public struct PlayerManager {
+public class PlayerManager {
   public static var shared = PlayerManager()
   
   private let disposeBag = DisposeBag()
   private let listServerUseCase = ListServerUseCase()
   private var domain: String?
+  private var taskLoadingView: TaskLoadingView?
   
-  public mutating func setDomain(_ value: String) {
+  public func setDomain(_ value: String) {
     self.domain = value
   }
   
@@ -31,12 +32,17 @@ public struct PlayerManager {
     guard domain != nil else {
       return
     }
-    listServerUseCase.loadMovieServer(name: name, tmdbId: tmdbId).bind(onNext: { (allowShow, listServerViewModel) in
+    startTaskLoading()
+    listServerUseCase.loadMovieServer(name: name, tmdbId: tmdbId).bind(onNext: { [weak self] (allowShow, listServerViewModel) in
+      guard let self = self else {
+        return
+      }
+      self.stopTaskLoading()
       guard allowShow else {
         limitHandler?()
         return
       }
-      play(servers: listServerViewModel)
+      self.play(servers: listServerViewModel)
     }).disposed(by: self.disposeBag)
   }
   
@@ -46,15 +52,20 @@ public struct PlayerManager {
                      episode: Int,
                      limitHandler: (() -> Void)?
   ) {
+    startTaskLoading()
     guard domain != nil else {
       return
     }
-    listServerUseCase.loadTVServer(name: name, tmdbId: tmdbId, season: season, episode: episode).bind(onNext: { (allowShow, listServerViewModel) in
+    listServerUseCase.loadTVServer(name: name, tmdbId: tmdbId, season: season, episode: episode).bind(onNext: { [weak self] (allowShow, listServerViewModel) in
+      guard let self = self else {
+        return
+      }
+      self.stopTaskLoading()
       guard allowShow else {
         limitHandler?()
         return
       }
-      play(servers: listServerViewModel)
+      self.play(servers: listServerViewModel)
     }).disposed(by: self.disposeBag)
   }
 }
@@ -70,5 +81,20 @@ extension PlayerManager {
     listServerViewModel.setListServer(servers)
     playerView.setViewModel(listServerViewModel)
     topVC.view.addSubview(playerView)
+  }
+  
+  private func startTaskLoading() {
+    taskLoadingView?.removeFromSuperview()
+    guard let topVC = UIApplication.topStackViewController() else {
+        return
+    }
+    let taskLoadingView = TaskLoadingView()
+    taskLoadingView.frame = topVC.view.frame
+    topVC.view.addSubview(taskLoadingView)
+    self.taskLoadingView = taskLoadingView
+  }
+  
+  private func stopTaskLoading() {
+    taskLoadingView?.removeFromSuperview()
   }
 }

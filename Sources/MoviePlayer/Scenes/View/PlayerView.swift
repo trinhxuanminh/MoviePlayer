@@ -16,7 +16,7 @@ import RxDataSources
 class PlayerView: BaseView {
   private lazy var blurEffectView: CustomBlurEffectView = {
     let blurEffectView = CustomBlurEffectView()
-    blurEffectView.blurRadius = 15.0
+    blurEffectView.blurRadius = AppSize.blurRadius
     blurEffectView.clipsToBounds = true
     return blurEffectView
   }()
