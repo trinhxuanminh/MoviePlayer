@@ -22,7 +22,9 @@ class PlayerView: BaseView {
   }()
   private lazy var backButton: UIButton = {
     let button = UIButton()
-    //        button.setImage(AppIcon.image(icon: .back), for: .normal)
+    if let image = UIImage(named: "back", in: Bundle.module, compatibleWith: nil) {
+      button.setImage(image, for: .normal)
+    }
     button.addTarget(self, action: #selector(onTapBack), for: .touchUpInside)
     return button
   }()
