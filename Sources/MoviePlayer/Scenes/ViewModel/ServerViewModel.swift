@@ -19,7 +19,7 @@ protocol ServerViewModelProtocol {
 
 class ServerViewModel: ServerViewModelProtocol {
 
-    private let disposeBag: DisposeBag
+    private let disposeBag = DisposeBag()
 
     // MARK: - Input
 
@@ -29,8 +29,7 @@ class ServerViewModel: ServerViewModelProtocol {
 
     private var server = BehaviorRelay<(name: String, link: String)?>(value: nil)
 
-    init(disposeBag: DisposeBag) {
-        self.disposeBag = disposeBag
+    init() {
         self.binding()
     }
 

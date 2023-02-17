@@ -23,7 +23,7 @@ protocol ListServerViewModelProtocol {
 
 class ListServerViewModel: ListServerViewModelProtocol {
 
-    private let disposeBag: DisposeBag
+    private let disposeBag = DisposeBag()
 
     // MARK: - Input
     private(set) var selectAction: Action<IndexPath, Void>!
@@ -33,8 +33,7 @@ class ListServerViewModel: ListServerViewModelProtocol {
 
     private var listServer: [ServerViewModelProtocol]?
 
-    init(disposeBag: DisposeBag) {
-        self.disposeBag = disposeBag
+    init() {
         self.binding()
     }
 
