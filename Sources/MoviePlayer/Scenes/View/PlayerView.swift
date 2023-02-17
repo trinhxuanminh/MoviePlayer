@@ -29,7 +29,7 @@ class PlayerView: BaseView {
   private lazy var loadingView: NVActivityIndicatorView = {
     let loadingView = NVActivityIndicatorView(frame: .zero)
     loadingView.type = .ballSpinFadeLoader
-    loadingView.padding = 30
+    loadingView.padding = AppSize.indicatorPadding
     return loadingView
   }()
   private lazy var webView: WKWebView = {
@@ -39,14 +39,6 @@ class PlayerView: BaseView {
     webView.isHidden = true
     return webView
   }()
-  
-  private var viewModel: ListServerViewModelProtocol! {
-    didSet {
-      binding()
-    }
-  }
-  private var stateIndex: Int = 0
-  
   private lazy var collectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .horizontal
@@ -58,60 +50,63 @@ class PlayerView: BaseView {
     return collectionView
   }()
   
+  private var viewModel: ListServerViewModelProtocol! {
+    didSet {
+      binding()
+    }
+  }
+  private var stateIndex: Int = 0
+  
   override func setColor() {
-    self.backButton.tintColor = UIColor(rgb: 0xFFFFFF)
-    self.blurEffectView.colorTint = UIColor(rgb: 0x120D29)
-    self.loadingView.color = UIColor(rgb: 0xFFFFFF)
+    backButton.tintColor = PlayerManager.shared.tintColor
+    blurEffectView.colorTint = PlayerManager.shared.backgroundColor
+    loadingView.color = PlayerManager.shared.tintColor
   }
   
   override func addComponents() {
-    self.addSubview(self.blurEffectView)
-    self.blurEffectView.addSubview(self.backButton)
-    self.blurEffectView.addSubview(self.loadingView)
-    self.blurEffectView.addSubview(self.collectionView)
-    self.blurEffectView.addSubview(self.webView)
+    addSubview(blurEffectView)
+    blurEffectView.addSubview(backButton)
+    blurEffectView.addSubview(loadingView)
+    blurEffectView.addSubview(collectionView)
+    blurEffectView.addSubview(webView)
   }
   
   override func setConstraints() {
-    self.blurEffectView.snp.makeConstraints { make in
+    blurEffectView.snp.makeConstraints { make in
       make.edges.equalToSuperview()
     }
-    
-    self.backButton.snp.makeConstraints { make in
-      make.top.equalTo(self.safeAreaLayoutGuide).inset(10)
+    backButton.snp.makeConstraints { make in
+      make.top.equalTo(safeAreaLayoutGuide).inset(10)
       make.width.height.equalTo(21)
-      make.leading.equalToSuperview().inset(16)
+      make.leading.equalToSuperview().inset(AppSize.inset)
     }
-    
-    self.loadingView.snp.makeConstraints { make in
+    loadingView.snp.makeConstraints { make in
       make.center.equalToSuperview()
-      make.width.height.equalTo(20)
+      make.width.height.equalTo(AppSize.indicator)
     }
-    
-    self.webView.snp.makeConstraints { make in
+    webView.snp.makeConstraints { make in
       make.centerY.equalToSuperview()
       make.trailing.leading.equalToSuperview()
-      make.height.equalTo(self.webView.snp.width).multipliedBy(10.0 / 16.0)
+      make.height.equalTo(webView.snp.width).multipliedBy(AppSize.mediaScale)
     }
-    
-    self.collectionView.snp.makeConstraints { make in
+    collectionView.snp.makeConstraints { make in
       make.trailing.leading.equalToSuperview()
       make.height.equalTo(36)
-      make.top.equalTo(self.webView.snp.bottom).inset(-20)
+      make.top.equalTo(webView.snp.bottom).inset(-20)
     }
   }
   
   override func draw(_ rect: CGRect) {
     super.draw(rect)
-    self.loadingView.startAnimating()
+    loadingView.startAnimating()
   }
   
   @objc private func onTapBack() {
-    self.removeFromSuperview()
+    removeFromSuperview()
   }
   
   override func binding() {
-    self.collectionView.rx.setDelegate(self).disposed(by: self.disposeBag)
+    collectionView.rx.setDelegate(self).disposed(by: disposeBag)
     
     let dataSource = RxCollectionViewSectionedReloadDataSource<CustomSectionModel> { [weak self] dataSource, collectionView, indexPath, item in
       let cell = collectionView.dequeue(ofType: ServerCVC.self, indexPath: indexPath)
@@ -126,10 +121,10 @@ class PlayerView: BaseView {
       return cell
     }
     
-    self.viewModel.sections.bind(to: self.collectionView.rx.items(dataSource: dataSource))
-      .disposed(by: self.disposeBag)
+    viewModel.sections.bind(to: collectionView.rx.items(dataSource: dataSource))
+      .disposed(by: disposeBag)
     
-    self.collectionView.rx.itemSelected.bind { [weak self] indexPath in
+    collectionView.rx.itemSelected.bind { [weak self] indexPath in
       guard let self = self else {
         return
       }
@@ -143,7 +138,7 @@ class PlayerView: BaseView {
       }
       self.stateIndex = indexPath.item
       self.viewModel.selectAction.execute(indexPath)
-    }.disposed(by: self.disposeBag)
+    }.disposed(by: disposeBag)
     
     self.viewModel.stateLink.bind { [weak self] link in
       guard let self = self, let link = link, let url = URL(string: link) else {
@@ -151,45 +146,45 @@ class PlayerView: BaseView {
       }
       self.webView.stopLoading()
       self.webView.load(URLRequest(url: url))
-    }.disposed(by: self.disposeBag)
+    }.disposed(by: disposeBag)
   }
 }
 
 extension PlayerView: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    let serverName = "#" + self.viewModel.getServerName(index: indexPath.item)
-    let widthText = serverName.widthText(height: 21, font: UIFont.systemFont(ofSize: 14))
-    return CGSize(width: widthText + 16.0 * 2, height: collectionView.frame.height)
+    let serverName = "#" + viewModel.getServerName(index: indexPath.item)
+    let widthText = serverName.widthText(height: 21, font: UIFont.systemFont(ofSize: AppSize.serverFont))
+    return CGSize(width: widthText + AppSize.inset * 2, height: collectionView.frame.height)
   }
   
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-    return UIEdgeInsets(top: .zero, left: 16.0, bottom: .zero, right: 16.0)
+    return UIEdgeInsets(top: .zero, left: AppSize.inset, bottom: .zero, right: AppSize.inset)
   }
   
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-    return 12.0
+    return AppSize.serverSpace
   }
   
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-    return 12.0
+    return AppSize.serverSpace
   }
 }
 
 extension PlayerView: WKNavigationDelegate {
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-    if let url = self.webView.url, !url.path.isEmpty {
-      self.loadingView.stopAnimating()
-      self.webView.isHidden = false
+    if let url = webView.url, !url.path.isEmpty {
+      loadingView.stopAnimating()
+      webView.isHidden = false
     }
   }
   
   func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-    self.webView.isHidden = true
-    self.loadingView.startAnimating()
+    webView.isHidden = true
+    loadingView.startAnimating()
   }
   
   func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-    self.webView.reload()
+    webView.reload()
   }
 }
 

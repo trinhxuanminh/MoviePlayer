@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  ItemRepository.swift
 //  
 //
 //  Created by Trịnh Xuân Minh on 17/02/2023.
@@ -15,7 +15,7 @@ protocol ItemRepositoryProtocol {
 
 class ItemRepository: APIService, ItemRepositoryProtocol {
   func loadServer(input: ItemServerInput) -> Observable<ItemServerOutput> {
-    return self.requestString(input)
+    return requestString(input)
       .observe(on: MainScheduler.instance)
       .map({ codingValue in
         return ItemServerOutput(html: codingValue)

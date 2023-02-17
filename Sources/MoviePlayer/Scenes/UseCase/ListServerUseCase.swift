@@ -28,7 +28,7 @@ class ListServerUseCase: ListServerUseCaseProtocol {
   }
   
   func loadTVServer(name: String, tmdbId: Int, season: Int, episode: Int) -> Observable<(Bool, [ServerViewModelProtocol])> {
-    return itemRepository.loadServer(input: .getTVShowServer(id: tmdbId, name: name, seasonNumber: season, episodeNumber: episode))
+    return itemRepository.loadServer(input: .getTVServer(id: tmdbId, name: name, season: season, episode: episode))
       .map { itemServer in
         return (itemServer.allowShow, itemServer.values.map({ server in
           let serverViewModel = ServerViewModel()

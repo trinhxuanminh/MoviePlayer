@@ -10,7 +10,6 @@ import UIKit
 enum ResponseError: Error {
   case noStatusCode
   case invalidData(data: Any)
-  
   case unknown(statusCode: Int)
   case notModified // 304
   case invalidRequest // 400

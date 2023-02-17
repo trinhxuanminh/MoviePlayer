@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import NVActivityIndicatorView
 
 public class PlayerManager {
   public static var shared = PlayerManager()
@@ -16,24 +17,37 @@ public class PlayerManager {
   private let listServerUseCase = ListServerUseCase()
   private var domain: String?
   private var taskLoadingView: TaskLoadingView?
+  private(set) var backgroundColor = UIColor(rgb: 0x000000)
+  private(set) var tintColor = UIColor(rgb: 0xFFFFFF)
+  private(set) var loadingType: NVActivityIndicatorType = .ballTrianglePath
   
   public func setDomain(_ value: String) {
     self.domain = value
   }
   
-  func getDomain() -> String {
-    return domain!
+  public func changeColor(background: UIColor? = nil, tint: UIColor? = nil) {
+    if let background = background {
+      self.backgroundColor = background
+    }
+    if let tint = tint {
+      self.tintColor = tint
+    }
+  }
+  
+  public func changeLoading(type: NVActivityIndicatorType) {
+    self.loadingType = type
   }
   
   public func showMovie(name: String,
-                                 tmdbId: Int,
-                                 limitHandler: (() -> Void)?
+                        tmdbId: Int,
+                        limitHandler: (() -> Void)?
   ) {
     guard domain != nil else {
       return
     }
     startTaskLoading()
-    listServerUseCase.loadMovieServer(name: name, tmdbId: tmdbId).bind(onNext: { [weak self] (allowShow, listServerViewModel) in
+    listServerUseCase.loadMovieServer(name: name, tmdbId: tmdbId)
+      .bind(onNext: { [weak self] (allowShow, listServerViewModel) in
       guard let self = self else {
         return
       }
@@ -56,7 +70,8 @@ public class PlayerManager {
     guard domain != nil else {
       return
     }
-    listServerUseCase.loadTVServer(name: name, tmdbId: tmdbId, season: season, episode: episode).bind(onNext: { [weak self] (allowShow, listServerViewModel) in
+    listServerUseCase.loadTVServer(name: name, tmdbId: tmdbId, season: season, episode: episode)
+      .bind(onNext: { [weak self] (allowShow, listServerViewModel) in
       guard let self = self else {
         return
       }
@@ -71,9 +86,13 @@ public class PlayerManager {
 }
 
 extension PlayerManager {
+  func getDomain() -> String {
+    return domain!
+  }
+  
   private func play(servers: [ServerViewModelProtocol]) {
     guard let topVC = UIApplication.topStackViewController() else {
-        return
+      return
     }
     let playerView = PlayerView()
     playerView.frame = topVC.view.frame
@@ -86,7 +105,7 @@ extension PlayerManager {
   private func startTaskLoading() {
     taskLoadingView?.removeFromSuperview()
     guard let topVC = UIApplication.topStackViewController() else {
-        return
+      return
     }
     let taskLoadingView = TaskLoadingView()
     taskLoadingView.frame = topVC.view.frame

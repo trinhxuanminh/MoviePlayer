@@ -11,12 +11,19 @@ public extension String {
   func heightText(width: CGFloat, font: UIFont) -> CGFloat {
     let maxSize = CGSize(width: width, height: CGFloat(MAXFLOAT))
     let text: String = self
-    return text.boundingRect(with: maxSize, options: .usesLineFragmentOrigin, attributes: [.font: font], context: nil).height + 1
+    return text.boundingRect(with: maxSize,
+                             options: .usesLineFragmentOrigin,
+                             attributes: [.font: font],
+                             context: nil)
+    .height + 1
   }
   
   func widthText(height: CGFloat, font: UIFont) -> CGFloat {
     let maxSize = CGSize(width: CGFloat(MAXFLOAT), height: height)
     let text: String = self
-    return text.boundingRect(with: maxSize, options: .usesLineFragmentOrigin, attributes: [.font: font], context: nil).width + 1
+    return text.boundingRect(with: maxSize,
+                             options: .usesLineFragmentOrigin,
+                             attributes: [.font: font], context: nil)
+    .width + 1
   }
 }

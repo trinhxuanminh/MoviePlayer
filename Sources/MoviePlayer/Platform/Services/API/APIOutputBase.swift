@@ -9,15 +9,9 @@ import ObjectMapper
 import Alamofire
 
 class APIOutputBase: Mappable {
-  init() {
-    
-  }
+  init() {}
   
-  required init?(map: Map) {
-    
-  }
+  required init?(map: Map) {}
   
-  func mapping(map: Map) {
-    
-  }
+  func mapping(map: Map) {}
 }

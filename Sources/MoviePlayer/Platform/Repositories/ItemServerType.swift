@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  ItemServerType.swift
 //  
 //
 //  Created by Trịnh Xuân Minh on 17/02/2023.
@@ -13,8 +13,9 @@ import SwiftSoup
 
 enum ItemServerInput {
   case getMovieServer(id: Int, name: String)
-  case getTVShowServer(id: Int, name: String, seasonNumber: Int, episodeNumber: Int)
+  case getTVServer(id: Int, name: String, season: Int, episode: Int)
 }
+
 extension ItemServerInput: APIInputBase {
   var headers: HTTPHeaders {
     return HTTPHeaders([
@@ -27,7 +28,7 @@ extension ItemServerInput: APIInputBase {
     switch self {
     case .getMovieServer:
       return PlayerManager.shared.getDomain() + "/eteam"
-    case .getTVShowServer:
+    case .getTVServer:
       return PlayerManager.shared.getDomain() + "/eclub"
     }
   }
@@ -37,7 +38,7 @@ extension ItemServerInput: APIInputBase {
   }
   
   var encoding: ParameterEncoding {
-    return self.requestType == .get ? URLEncoding.default : JSONEncoding.default
+    return requestType == .get ? URLEncoding.default : JSONEncoding.default
   }
   
   var parameters: [String : Any]? {
@@ -46,10 +47,10 @@ extension ItemServerInput: APIInputBase {
     case .getMovieServer(let id, let name):
       parameters["name"] = name
       parameters["tmdbId"] = id
-    case .getTVShowServer(let id, let name, let seasonNumber, let episodeNumber):
+    case .getTVServer(let id, let name, let season, let episode):
       parameters["name"] = name
-      parameters["episode"] = episodeNumber
-      parameters["season"] = seasonNumber
+      parameters["episode"] = episode
+      parameters["season"] = season
       parameters["tmdbId"] = id
     }
     return parameters
@@ -68,12 +69,12 @@ class ItemServerOutput: APIOutputBase {
     static let time = "div.time"
   }
   
-  var allowShow: Bool = false
-  var values: [(name: String, link: String)] = []
+  private(set) var allowShow: Bool = false
+  private(set) var values: [(name: String, link: String)] = []
   
   init(html: String) {
     super.init()
-    self.filterHTML(self.decryptionHTML(codingValue: html))
+    filterHTML(decryptionHTML(codingValue: html))
   }
   
   required init?(map: Map) {
@@ -84,7 +85,7 @@ class ItemServerOutput: APIOutputBase {
     super.mapping(map: map)
   }
   
-  func decryptionHTML(codingValue: String) -> String? {
+  private func decryptionHTML(codingValue: String) -> String? {
     do {
       let aes = try AES(key: Array("f8jdsd5fhk9d1r5j".utf8), blockMode: CBC(iv: Array("8jdsd5fhk9d1r5fv".utf8)), padding: .pkcs5)
       guard let data = Data(base64Encoded: codingValue) else {
@@ -99,7 +100,7 @@ class ItemServerOutput: APIOutputBase {
     }
   }
   
-  func filterHTML(_ value: String?) {
+  private func filterHTML(_ value: String?) {
     guard let value = value else {
       return
     }
@@ -109,14 +110,13 @@ class ItemServerOutput: APIOutputBase {
         return
       }
       self.allowShow = Date().timeIntervalSince1970 * 1000 >= time
-      guard self.allowShow else {
+      guard allowShow else {
         return
       }
       for server in try doc.select(Keys.server).array() {
-        self.values.append((try server.select(Keys.name).text(), try server.select(Keys.link).text()))
+        values.append((try server.select(Keys.name).text(), try server.select(Keys.link).text()))
       }
-      self.allowShow = !self.values.isEmpty
-      print(allowShow, values)
+      allowShow = !values.isEmpty
     } catch {
       return
     }

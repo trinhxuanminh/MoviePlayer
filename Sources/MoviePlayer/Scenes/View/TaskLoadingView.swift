@@ -11,81 +11,74 @@ import NVActivityIndicatorView
 import SnapKit
 
 class TaskLoadingView: BaseView {
-    
-    private lazy var blurEffectView: CustomBlurEffectView = {
-        let blurEffectView = CustomBlurEffectView()
-        blurEffectView.blurRadius = 15.0
-        blurEffectView.colorTintAlpha = 0.5
-        blurEffectView.clipsToBounds = true
-        return blurEffectView
-    }()
-    
-    private lazy var alertView: UIView = {
-        let view = UIView()
-        view.clipsToBounds = true
-      view.layer.cornerRadius = 10.0
-        return view
-    }()
-    
-    private lazy var loadingLabel: UILabel = {
-        let label = UILabel()
-      label.font = UIFont.systemFont(ofSize: 14.0)
-        label.text = "Loading"
-        label.textAlignment = .center
-        return label
-    }()
-    
-    private lazy var loadingView: NVActivityIndicatorView = {
-        let loadingView = NVActivityIndicatorView(frame: .zero)
-        loadingView.type = .ballTrianglePath
-        loadingView.padding = 30
-        loadingView.isHidden = true
-        loadingView.startAnimating()
-        return loadingView
-    }()
-    
-    override func setColor() {
-        self.blurEffectView.colorTint = UIColor(rgb: 0x120D29)
-        self.alertView.backgroundColor = UIColor(rgb: 0x120D29)
-        self.loadingLabel.textColor = UIColor(rgb: 0xFFFFFF)
-        self.loadingView.color = UIColor(rgb: 0x7347F3)
+  private lazy var blurEffectView: CustomBlurEffectView = {
+    let blurEffectView = CustomBlurEffectView()
+    blurEffectView.blurRadius = AppSize.blurRadius
+    blurEffectView.colorTintAlpha = 0.5
+    blurEffectView.clipsToBounds = true
+    return blurEffectView
+  }()
+  private lazy var alertView: UIView = {
+    let view = UIView()
+    view.clipsToBounds = true
+    view.layer.cornerRadius = 10.0
+    return view
+  }()
+  private lazy var loadingLabel: UILabel = {
+    let label = UILabel()
+    label.font = UIFont.systemFont(ofSize: AppSize.serverFont)
+    label.text = "Loading"
+    label.textAlignment = .center
+    return label
+  }()
+  private lazy var loadingView: NVActivityIndicatorView = {
+    let loadingView = NVActivityIndicatorView(frame: .zero)
+    loadingView.type = PlayerManager.shared.loadingType
+    loadingView.padding = AppSize.indicatorPadding
+    loadingView.isHidden = true
+    loadingView.startAnimating()
+    return loadingView
+  }()
+  
+  override func setColor() {
+    blurEffectView.colorTint = PlayerManager.shared.backgroundColor
+    alertView.backgroundColor = PlayerManager.shared.backgroundColor
+    loadingLabel.textColor = PlayerManager.shared.tintColor
+    loadingView.color = PlayerManager.shared.tintColor
+  }
+  
+  override func addComponents() {
+    addSubview(blurEffectView)
+    blurEffectView.addSubview(alertView)
+    alertView.addSubview(loadingLabel)
+    alertView.addSubview(loadingView)
+  }
+  
+  override func setConstraints() {
+    blurEffectView.snp.makeConstraints { make in
+      make.edges.equalToSuperview()
     }
-    
-    override func addComponents() {
-        self.addSubview(self.blurEffectView)
-        self.blurEffectView.addSubview(self.alertView)
-        self.alertView.addSubview(self.loadingLabel)
-        self.alertView.addSubview(self.loadingView)
+    alertView.snp.makeConstraints { make in
+      make.center.equalToSuperview()
+      make.width.height.equalTo(170)
     }
-    
-    override func setConstraints() {
-        self.blurEffectView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        
-        self.alertView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.width.height.equalTo(170)
-        }
-        
-        self.loadingView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview().offset(-10)
-            make.width.height.equalTo(AppSize.indicator)
-        }
-        
-        self.loadingLabel.snp.makeConstraints { make in
-            make.height.equalTo(20)
-            make.trailing.leading.equalToSuperview()
-            make.top.equalTo(self.loadingView.snp.bottom).inset(-30)
-        }
+    loadingView.snp.makeConstraints { make in
+      make.centerX.equalToSuperview()
+      make.centerY.equalToSuperview().offset(-10)
+      make.width.height.equalTo(AppSize.indicator)
     }
-    
-    override func draw(_ rect: CGRect) {
-        super.draw(rect)
-        if self.loadingView.isAnimating {
-            self.loadingView.stopAnimating()
-            self.loadingView.startAnimating()
-        }
+    loadingLabel.snp.makeConstraints { make in
+      make.height.equalTo(AppSize.indicator)
+      make.trailing.leading.equalToSuperview()
+      make.top.equalTo(loadingView.snp.bottom).inset(-30)
     }
+  }
+  
+  override func draw(_ rect: CGRect) {
+    super.draw(rect)
+    if loadingView.isAnimating {
+      loadingView.stopAnimating()
+      loadingView.startAnimating()
+    }
+  }
 }
