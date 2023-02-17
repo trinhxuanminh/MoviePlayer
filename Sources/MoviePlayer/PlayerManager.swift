@@ -14,25 +14,36 @@ public struct PlayerManager {
   
   private let disposeBag = DisposeBag()
   private let listServerUseCase = ListServerUseCase()
-  var movieDomain: String!
-  var tvDomain: String!
+  private var domain: String?
   
-  public mutating func showMovie(domain: String,
-                                 name: String,
+  public mutating func setDomain(_ value: String) {
+    self.domain = value
+  }
+  
+  func getDomain() -> String {
+    return domain!
+  }
+  
+  public func showMovie(name: String,
                                  tmdbId: Int,
                                  limitHandler: (() -> Void)?
   ) {
-    self.movieDomain = domain
+    guard domain != nil else {
+      return
+    }
     listServerUseCase.loadMovieServer(name: name, tmdbId: tmdbId).bind(onNext: { (allowShow, listServerViewModel) in
       print(allowShow, listServerViewModel)
     }).disposed(by: self.disposeBag)
   }
   
-  public func showTV(domain: String,
-                     name: String,
+  public func showTV(name: String,
                      tmdbId: Int,
                      season: Int,
                      episode: Int,
                      limitHandler: (() -> Void)?
-  ) {}
+  ) {
+    guard domain != nil else {
+      return
+    }
+  }
 }
