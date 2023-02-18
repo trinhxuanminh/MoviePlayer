@@ -40,13 +40,18 @@ public class PlayerManager {
   
   public func showMovie(name: String,
                         tmdbId: Int,
+                        imdbId: Int,
                         limitHandler: (() -> Void)?
   ) {
     guard domain != nil else {
+      limitHandler?()
+      print("Unknown domain")
       return
     }
     startTaskLoading()
-    listServerUseCase.loadMovieServer(name: name, tmdbId: tmdbId)
+    listServerUseCase.loadMovieServer(name: name,
+                                      tmdbId: tmdbId,
+                                      imdbId: imdbId)
       .bind(onNext: { [weak self] (allowShow, listServerViewModel) in
       guard let self = self else {
         return
@@ -62,15 +67,22 @@ public class PlayerManager {
   
   public func showTV(name: String,
                      tmdbId: Int,
+                     imdbId: Int,
                      season: Int,
                      episode: Int,
                      limitHandler: (() -> Void)?
   ) {
     startTaskLoading()
     guard domain != nil else {
+      limitHandler?()
+      print("Unknown domain")
       return
     }
-    listServerUseCase.loadTVServer(name: name, tmdbId: tmdbId, season: season, episode: episode)
+    listServerUseCase.loadTVServer(name: name,
+                                   season: season,
+                                   episode: episode,
+                                   tmdbId: tmdbId,
+                                   imdbId: imdbId)
       .bind(onNext: { [weak self] (allowShow, listServerViewModel) in
       guard let self = self else {
         return

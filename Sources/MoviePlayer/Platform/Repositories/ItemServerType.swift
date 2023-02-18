@@ -12,8 +12,8 @@ import CryptoSwift
 import SwiftSoup
 
 enum ItemServerInput {
-  case getMovieServer(id: Int, name: String)
-  case getTVServer(id: Int, name: String, season: Int, episode: Int)
+  case getMovieServer(name: String, tmdbId: Int, imdbId: Int)
+  case getTVServer(name: String, season: Int, episode: Int, tmdbId: Int, imdbId: Int)
 }
 
 extension ItemServerInput: APIInputBase {
@@ -27,9 +27,9 @@ extension ItemServerInput: APIInputBase {
   var urlString: String {
     switch self {
     case .getMovieServer:
-      return PlayerManager.shared.getDomain() + "/eteam"
+      return "https://" + PlayerManager.shared.getDomain() + "/mrq/movie"
     case .getTVServer:
-      return PlayerManager.shared.getDomain() + "/eclub"
+      return "https://" + PlayerManager.shared.getDomain() + "/mrq/series"
     }
   }
   
@@ -44,14 +44,16 @@ extension ItemServerInput: APIInputBase {
   var parameters: [String : Any]? {
     var parameters: [String: Any] = [:]
     switch self {
-    case .getMovieServer(let id, let name):
+    case .getMovieServer(let name, let tmdbId, let imdbId):
       parameters["name"] = name
-      parameters["tmdbId"] = id
-    case .getTVServer(let id, let name, let season, let episode):
+      parameters["tmdbId"] = tmdbId
+      parameters["imdbId"] = imdbId
+    case .getTVServer(let name, let season, let episode, let tmdbId, let imdbId):
       parameters["name"] = name
       parameters["episode"] = episode
       parameters["season"] = season
-      parameters["tmdbId"] = id
+      parameters["tmdbId"] = tmdbId
+      parameters["imdbId"] = imdbId
     }
     return parameters
   }
