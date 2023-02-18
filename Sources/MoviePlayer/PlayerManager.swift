@@ -45,7 +45,7 @@ public class PlayerManager {
   ) {
     guard domain != nil else {
       limitHandler?()
-      print("Unknown domain")
+      print("Unknown domain!")
       return
     }
     startTaskLoading()
@@ -75,7 +75,7 @@ public class PlayerManager {
     startTaskLoading()
     guard domain != nil else {
       limitHandler?()
-      print("Unknown domain")
+      print("Unknown domain!")
       return
     }
     listServerUseCase.loadTVServer(name: name,

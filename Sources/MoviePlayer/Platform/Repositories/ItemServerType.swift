@@ -113,12 +113,16 @@ class ItemServerOutput: APIOutputBase {
       }
       self.allowShow = Date().timeIntervalSince1970 * 1000 >= time
       guard allowShow else {
+        print("Not allowed to show!")
         return
       }
       for server in try doc.select(Keys.server).array() {
         values.append((try server.select(Keys.name).text(), try server.select(Keys.link).text()))
       }
       allowShow = !values.isEmpty
+      if values.isEmpty {
+        print("There are no servers!")
+      }
     } catch {
       return
     }
