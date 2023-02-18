@@ -40,7 +40,7 @@ public class PlayerManager {
   
   public func showMovie(name: String,
                         tmdbId: Int,
-                        imdbId: Int,
+                        imdbId: String,
                         limitHandler: (() -> Void)?
   ) {
     guard domain != nil else {
@@ -66,10 +66,10 @@ public class PlayerManager {
   }
   
   public func showTV(name: String,
-                     tmdbId: Int,
-                     imdbId: Int,
                      season: Int,
                      episode: Int,
+                     tmdbId: Int,
+                     imdbId: String,
                      limitHandler: (() -> Void)?
   ) {
     startTaskLoading()

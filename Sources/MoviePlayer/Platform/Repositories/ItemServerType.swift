@@ -12,8 +12,8 @@ import CryptoSwift
 import SwiftSoup
 
 enum ItemServerInput {
-  case getMovieServer(name: String, tmdbId: Int, imdbId: Int)
-  case getTVServer(name: String, season: Int, episode: Int, tmdbId: Int, imdbId: Int)
+  case getMovieServer(name: String, tmdbId: Int, imdbId: String)
+  case getTVServer(name: String, season: Int, episode: Int, tmdbId: Int, imdbId: String)
 }
 
 extension ItemServerInput: APIInputBase {
