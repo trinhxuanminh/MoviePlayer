@@ -15,14 +15,23 @@ public class PlayerManager {
   
   private let disposeBag = DisposeBag()
   private let listServerUseCase = ListServerUseCase()
+  private let domainUseCase = DomainUseCase()
   private var domain: String?
+  private var ip: String?
   private var taskLoadingView: TaskLoadingView?
   private(set) var backgroundColor = UIColor(rgb: 0x000000)
   private(set) var tintColor = UIColor(rgb: 0xFFFFFF)
   private(set) var loadingType: NVActivityIndicatorType = .ballTrianglePath
   
-  public func setDomain(_ value: String) {
-    self.domain = value
+  public func configDomain(ip: String) {
+    self.ip = ip
+    domainUseCase.config()
+      .bind(onNext: { [weak self] appDomain in
+        guard let self = self, let appDomain = appDomain else {
+          return
+        }
+        self.setDomain(appDomain)
+      }).disposed(by: disposeBag)
   }
   
   public func changeColor(background: UIColor? = nil, tint: UIColor? = nil) {
@@ -62,7 +71,7 @@ public class PlayerManager {
         return
       }
       self.play(servers: listServerViewModel)
-    }).disposed(by: self.disposeBag)
+    }).disposed(by: disposeBag)
   }
   
   public func showTV(name: String,
@@ -91,13 +100,21 @@ public class PlayerManager {
         return
       }
       self.play(servers: listServerViewModel)
-    }).disposed(by: self.disposeBag)
+    }).disposed(by: disposeBag)
   }
 }
 
 extension PlayerManager {
+  func getIP() -> String {
+    return ip!
+  }
+  
   func getDomain() -> String {
     return domain!
+  }
+  
+  private func setDomain(_ value: String) {
+    self.domain = value
   }
   
   private func play(servers: [ServerViewModelProtocol]) {
