@@ -27,9 +27,9 @@ extension ItemServerInput: APIInputBase {
   var urlString: String {
     switch self {
     case .getMovieServer:
-      return "https://" + PlayerManager.shared.getDomain() + "/mrq/movie"
+      return PlayerManager.shared.getDomain() + "/mrq/movie"
     case .getTVServer:
-      return "https://" + PlayerManager.shared.getDomain() + "/mrq/series"
+      return PlayerManager.shared.getDomain() + "/mrq/series"
     }
   }
   
