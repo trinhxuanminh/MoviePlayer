@@ -13,7 +13,7 @@ import SwiftSoup
 
 enum ItemServerInput {
   case getMovieServer(name: String, tmdbId: Int, imdbId: String)
-  case getTVServer(name: String, season: Int, episode: Int, tmdbId: Int, imdbId: String)
+  case getTVServer(name: String, season: Int, episode: Int, tmdbId: Int)
 }
 
 extension ItemServerInput: APIInputBase {
@@ -48,12 +48,11 @@ extension ItemServerInput: APIInputBase {
       parameters["name"] = name
       parameters["tmdbId"] = tmdbId
       parameters["imdbId"] = imdbId
-    case .getTVServer(let name, let season, let episode, let tmdbId, let imdbId):
+    case .getTVServer(let name, let season, let episode, let tmdbId):
       parameters["name"] = name
       parameters["episode"] = episode
       parameters["season"] = season
       parameters["tmdbId"] = tmdbId
-      parameters["imdbId"] = imdbId
     }
     return parameters
   }

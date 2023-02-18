@@ -69,7 +69,6 @@ public class PlayerManager {
                      season: Int,
                      episode: Int,
                      tmdbId: Int,
-                     imdbId: String,
                      limitHandler: (() -> Void)?
   ) {
     startTaskLoading()
@@ -81,8 +80,7 @@ public class PlayerManager {
     listServerUseCase.loadTVServer(name: name,
                                    season: season,
                                    episode: episode,
-                                   tmdbId: tmdbId,
-                                   imdbId: imdbId)
+                                   tmdbId: tmdbId)
       .bind(onNext: { [weak self] (allowShow, listServerViewModel) in
       guard let self = self else {
         return

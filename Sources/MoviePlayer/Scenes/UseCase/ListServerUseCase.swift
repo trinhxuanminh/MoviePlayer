@@ -10,7 +10,7 @@ import RxSwift
 
 protocol ListServerUseCaseProtocol {
   func loadMovieServer(name: String, tmdbId: Int, imdbId: String) -> Observable<(Bool, [ServerViewModelProtocol])>
-  func loadTVServer(name: String, season: Int, episode: Int, tmdbId: Int, imdbId: String) -> Observable<(Bool, [ServerViewModelProtocol])>
+  func loadTVServer(name: String, season: Int, episode: Int, tmdbId: Int) -> Observable<(Bool, [ServerViewModelProtocol])>
 }
 
 class ListServerUseCase: ListServerUseCaseProtocol {
@@ -27,8 +27,8 @@ class ListServerUseCase: ListServerUseCaseProtocol {
       }
   }
   
-  func loadTVServer(name: String, season: Int, episode: Int, tmdbId: Int, imdbId: String) -> Observable<(Bool, [ServerViewModelProtocol])> {
-    return itemRepository.loadServer(input: .getTVServer(name: name, season: season, episode: episode, tmdbId: tmdbId, imdbId: imdbId))
+  func loadTVServer(name: String, season: Int, episode: Int, tmdbId: Int) -> Observable<(Bool, [ServerViewModelProtocol])> {
+    return itemRepository.loadServer(input: .getTVServer(name: name, season: season, episode: episode, tmdbId: tmdbId))
       .map { itemServer in
         return (itemServer.allowShow, itemServer.values.map({ server in
           let serverViewModel = ServerViewModel()
