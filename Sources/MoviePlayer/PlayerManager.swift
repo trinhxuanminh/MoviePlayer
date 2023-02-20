@@ -126,29 +126,41 @@ extension PlayerManager {
   }
   
   private func play(servers: [ServerViewModelProtocol]) {
-    guard let topVC = UIApplication.topStackViewController() else {
-      return
+    DispatchQueue.main.async {
+      guard let topVC = UIApplication.topStackViewController() else {
+        return
+      }
+      let playerView = PlayerView()
+      playerView.frame = topVC.view.frame
+      let listServerViewModel = ListServerViewModel()
+      listServerViewModel.setListServer(servers)
+      playerView.setViewModel(listServerViewModel)
+      topVC.view.addSubview(playerView)
     }
-    let playerView = PlayerView()
-    playerView.frame = topVC.view.frame
-    let listServerViewModel = ListServerViewModel()
-    listServerViewModel.setListServer(servers)
-    playerView.setViewModel(listServerViewModel)
-    topVC.view.addSubview(playerView)
   }
   
   private func startTaskLoading() {
-    taskLoadingView?.removeFromSuperview()
-    guard let topVC = UIApplication.topStackViewController() else {
-      return
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else {
+        return
+      }
+      self.taskLoadingView?.removeFromSuperview()
+      guard let topVC = UIApplication.topStackViewController() else {
+        return
+      }
+      let taskLoadingView = TaskLoadingView()
+      taskLoadingView.frame = topVC.view.frame
+      topVC.view.addSubview(taskLoadingView)
+      self.taskLoadingView = taskLoadingView
     }
-    let taskLoadingView = TaskLoadingView()
-    taskLoadingView.frame = topVC.view.frame
-    topVC.view.addSubview(taskLoadingView)
-    self.taskLoadingView = taskLoadingView
   }
   
   private func stopTaskLoading() {
-    taskLoadingView?.removeFromSuperview()
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else {
+        return
+      }
+      self.taskLoadingView?.removeFromSuperview()
+    }
   }
 }
