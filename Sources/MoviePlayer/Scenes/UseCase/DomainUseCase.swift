@@ -9,16 +9,13 @@ import Foundation
 import RxSwift
 
 protocol DomainUseCaseProtocol {
-  func config() -> Observable<String?>
+  func config(completionHandler: @escaping (String?) -> Void)
 }
 
 class DomainUseCase: DomainUseCaseProtocol {
   private let domainRepository = DomainRepository()
   
-  func config() -> Observable<String?> {
-    return domainRepository.config(input: .config)
-      .map { domainOutput in
-        return domainOutput.domain.appDomain
-      }
+  func config(completionHandler: @escaping (String?) -> Void) {
+    return domainRepository.config(input: .config, completionHandler: completionHandler)
   }
 }

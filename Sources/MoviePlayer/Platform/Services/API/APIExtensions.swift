@@ -7,14 +7,18 @@
 
 import Foundation
 
+enum Method: String {
+  case get = "GET"
+}
+
 extension URL {
   /**
    Creates a new URL by adding the given query parameters.
    @param parametersDictionary The query parameter dictionary to add.
    @return A new URL.
    */
-  func appendingQueryParameters(_ parametersDictionary : Dictionary<String, String>) -> URL {
-    let URLString : String = String(format: "%@?%@", absoluteString, parametersDictionary.queryParameters)
+  func appendingQueryParameters(_ parametersDictionary: Dictionary<String, Any>) -> URL {
+    let URLString = String(format: "%@?%@", absoluteString, parametersDictionary.queryParameters)
     return URL(string: URLString)!
   }
 }
@@ -23,7 +27,7 @@ protocol URLQueryParameterStringConvertible {
   var queryParameters: String {get}
 }
 
-extension Dictionary : URLQueryParameterStringConvertible {
+extension Dictionary: URLQueryParameterStringConvertible {
   /**
    This computed property returns a query parameters string from the given NSDictionary. For
    example, if the input is @{@"day":@"Tuesday", @"month":@"January"}, the output
@@ -39,5 +43,13 @@ extension Dictionary : URLQueryParameterStringConvertible {
       parts.append(part as String)
     }
     return parts.joined(separator: "&")
+  }
+}
+
+extension URLRequest {
+  mutating func appendingHeaders(_ headersDictionary: Dictionary<String, String>) {
+    for (key, value) in headersDictionary {
+      addValue(value, forHTTPHeaderField: key)
+    }
   }
 }

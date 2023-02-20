@@ -17,6 +17,7 @@ public class PlayerManager {
   private let listServerUseCase = ListServerUseCase()
   private let domainUseCase = DomainUseCase()
   private var domain: String?
+  private var allowShow: Bool?
   private var ip: String?
   private var taskLoadingView: TaskLoadingView?
   private(set) var backgroundColor = UIColor(rgb: 0x000000)
@@ -25,13 +26,12 @@ public class PlayerManager {
   
   public func configDomain(ip: String) {
     self.ip = ip
-    domainUseCase.config()
-      .bind(onNext: { [weak self] appDomain in
-        guard let self = self, let appDomain = appDomain else {
-          return
-        }
-        self.setDomain(appDomain)
-      }).disposed(by: disposeBag)
+    domainUseCase.config { [weak self] appDomain in
+      guard let self = self, let appDomain = appDomain else {
+        return
+      }
+      self.setDomain(appDomain)
+    }
   }
   
   public func changeColor(background: UIColor? = nil, tint: UIColor? = nil) {
@@ -52,6 +52,9 @@ public class PlayerManager {
                         imdbId: String,
                         limitHandler: (() -> Void)?
   ) {
+    guard allowShow != false else {
+      return
+    }
     guard domain != nil else {
       limitHandler?()
       print("Unknown domain!")
@@ -60,18 +63,19 @@ public class PlayerManager {
     startTaskLoading()
     listServerUseCase.loadMovieServer(name: name,
                                       tmdbId: tmdbId,
-                                      imdbId: imdbId)
-      .bind(onNext: { [weak self] (allowShow, listServerViewModel) in
-      guard let self = self else {
-        return
-      }
-      self.stopTaskLoading()
-      guard allowShow else {
+                                      imdbId: imdbId) { [weak self] output in
+      guard let self = self, let output = output else {
         limitHandler?()
         return
       }
-      self.play(servers: listServerViewModel)
-    }).disposed(by: disposeBag)
+      self.stopTaskLoading()
+      guard output.0 else {
+        limitHandler?()
+        self.allowShow = false
+        return
+      }
+      self.play(servers: output.1)
+    }
   }
   
   public func showTV(name: String,
@@ -80,27 +84,31 @@ public class PlayerManager {
                      tmdbId: Int,
                      limitHandler: (() -> Void)?
   ) {
-    startTaskLoading()
+    guard allowShow != false else {
+      return
+    }
     guard domain != nil else {
       limitHandler?()
       print("Unknown domain!")
       return
     }
+    startTaskLoading()
     listServerUseCase.loadTVServer(name: name,
                                    season: season,
                                    episode: episode,
-                                   tmdbId: tmdbId)
-      .bind(onNext: { [weak self] (allowShow, listServerViewModel) in
-      guard let self = self else {
-        return
-      }
-      self.stopTaskLoading()
-      guard allowShow else {
+                                   tmdbId: tmdbId) { [weak self] output in
+      guard let self = self, let output = output else {
         limitHandler?()
         return
       }
-      self.play(servers: listServerViewModel)
-    }).disposed(by: disposeBag)
+      self.stopTaskLoading()
+      guard output.0 else {
+        limitHandler?()
+        self.allowShow = false
+        return
+      }
+      self.play(servers: output.1)
+    }
   }
 }
 

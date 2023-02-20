@@ -10,16 +10,17 @@ import RxSwift
 import RxCocoa
 
 protocol DomainRepositoryProtocol {
-  func config(input: DomainInput) -> Observable<DomainOutput>
+  func config(input: DomainInput, completionHandler: @escaping (String?) -> Void)
 }
 
 class DomainRepository: APIService, DomainRepositoryProtocol {
-  func config(input: DomainInput) -> Observable<DomainOutput> {
-    return self.request(input)
-      .observe(on: MainScheduler.instance)
-      .map({ domain in
-        return DomainOutput(domain)
-      })
-      .share(replay: 1, scope: .whileConnected)
+  func config(input: DomainInput, completionHandler: @escaping (String?) -> Void) {
+    request(input) { output in
+      guard let output = output, let appDomain = output["appDomain"] as? String else {
+        completionHandler(nil)
+        return
+      }
+      completionHandler(appDomain)
+    }
   }
 }

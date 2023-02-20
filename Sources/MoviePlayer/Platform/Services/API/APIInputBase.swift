@@ -6,14 +6,12 @@
 //
 
 import Foundation
-import ObjectMapper
-import Alamofire
 
 protocol APIInputBase {
-  var headers: HTTPHeaders { get }
+  var headers: Dictionary<String, String> { get }
   var urlString: String { get }
-  var requestType: HTTPMethod { get }
-  var encoding: ParameterEncoding { get }
-  var parameters: [String: Any]? { get }
-  var requireAccessToken: Bool { get }
+  var requestType: Method { get }
+  var parameters: Dictionary<String, Any>? { get }
 }
+
+

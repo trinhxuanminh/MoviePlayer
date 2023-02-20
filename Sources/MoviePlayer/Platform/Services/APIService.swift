@@ -9,112 +9,67 @@ import Foundation
 import RxSwift
 import ObjectMapper
 import RxCocoa
-import Alamofire
-import RxAlamofire
-
-enum APIError: Error {
-  case invalidURL(url: String)
-  case invalidResponseData(data: Any)
-  case error(responseCode: Int, data: Any)
-}
 
 protocol APIServiceProtocol {
-  func request<T: Mappable>(_ input: APIInputBase) -> Observable<T>
-  func requestArray<T: Mappable>(_ input: APIInputBase) -> Observable<[T]>
-  func requestString(_ input: APIInputBase) -> Observable<String>
+  func request(_ input: APIInputBase, completionHandler: @escaping (Dictionary<String, AnyObject>?) -> Void)
+  func requestString(_ input: APIInputBase, completionHandler: @escaping (String?) -> Void)
 }
 
 class APIService: APIServiceProtocol {
-  private func _request(_ input: APIInputBase) -> Observable<Any> {
-    let manager = Alamofire.Session.default
-    return manager.rx
-      .request(input.requestType,
-               input.urlString,
-               parameters: input.parameters,
-               encoding: input.encoding,
-               headers: input.headers)
-      .flatMap { dataRequest -> Observable<DataResponse<Any, AFError>> in
-        return dataRequest.rx.responseJSON()
-      }
-      .map { response -> Any in
-        return try self.process(response)
-      }
-  }
-  
-  private func process(_ response: DataResponse<Any, AFError>) throws -> Any {
-    let error: Error
-    switch response.result {
-    case .success(let value):
-      if let statusCode = response.response?.statusCode {
-        switch statusCode {
-        case 200:
-          return value
-        case 304:
-          error = ResponseError.notModified
-        case 400:
-          error = ResponseError.invalidRequest
-        case 401:
-          error = ResponseError.unauthorized
-        case 403:
-          error = ResponseError.accessDenied
-        case 404:
-          error = ResponseError.notFound
-        case 405:
-          error = ResponseError.methodNotAllowed
-        case 422:
-          error = ResponseError.validate
-        case 500:
-          error = ResponseError.serverError
-        case 502:
-          error = ResponseError.badGateway
-        case 503:
-          error = ResponseError.serviceUnavailable
-        case 504:
-          error = ResponseError.gatewayTimeout
-        default:
-          error = ResponseError.unknown(statusCode: statusCode)
-        }
-      } else {
-        error = ResponseError.noStatusCode
-      }
-    case .failure(let e):
-      error = e
+  func request(_ input: APIInputBase, completionHandler: @escaping (Dictionary<String, AnyObject>?) -> Void) {
+    guard let urlBase = URL(string: input.urlString) else {
+      completionHandler(nil)
+      return
     }
-    print(error)
-    throw error
-  }
-  
-  func request<T: Mappable>(_ input: APIInputBase) -> Observable<T> {
-    return _request(input)
-      .map { data -> T in
-        if let json = data as? [String: Any], let item = T(JSON: json) {
-          return item
-        } else {
-          throw APIError.invalidResponseData(data: data)
-        }
-      }
+    var url = urlBase
+    if let parameters = input.parameters {
+      url = urlBase.appendingQueryParameters(parameters)
+    }
+    var request = URLRequest(url: url)
+    request.httpMethod = input.requestType.rawValue
+    request.appendingHeaders(input.headers)
     
-  }
-  
-  func requestArray<T: Mappable>(_ input: APIInputBase) -> Observable<[T]> {
-    return _request(input)
-      .map { data -> [T] in
-        if let jsonArray = data as? [[String: Any]] {
-          return Mapper<T>().mapArray(JSONArray: jsonArray)
-        } else {
-          throw APIError.invalidResponseData(data: data)
-        }
+    let session = URLSession.shared
+    let task = session.dataTask(with: request, completionHandler: { data, response, error in
+      guard error == nil, let data = data else {
+        print(error as Any)
+        completionHandler(nil)
+        return
       }
+      do {
+        let json = try JSONSerialization.jsonObject(with: data) as! Dictionary<String, AnyObject>
+        completionHandler(json)
+      } catch let error {
+        print(error)
+        completionHandler(nil)
+      }
+    })
+    task.resume()
   }
   
-  func requestString(_ input: APIInputBase) -> Observable<String> {
-    let manager = Alamofire.Session.default
-    return manager.rx
-      .string(input.requestType,
-              input.urlString,
-              parameters: input.parameters,
-              encoding: input.encoding,
-              headers: input.headers)
+  func requestString(_ input: APIInputBase, completionHandler: @escaping (String?) -> Void) {
+    guard let urlBase = URL(string: input.urlString) else {
+      completionHandler(nil)
+      return
+    }
+    var url = urlBase
+    if let parameters = input.parameters {
+      url = urlBase.appendingQueryParameters(parameters)
+    }
+    var request = URLRequest(url: url)
+    request.httpMethod = input.requestType.rawValue
+    request.appendingHeaders(input.headers)
+    
+    let session = URLSession.shared
+    let task = session.dataTask(with: request, completionHandler: { data, response, error in
+      guard error == nil, let data = data else {
+        print(error as Any)
+        completionHandler(nil)
+        return
+      }
+      let json = String(data: data, encoding: .utf8)
+      completionHandler(json)
+    })
+    task.resume()
   }
 }
-
