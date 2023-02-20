@@ -7,7 +7,6 @@
 
 import Foundation
 import RxSwift
-import ObjectMapper
 import RxCocoa
 
 protocol APIServiceProtocol {
