@@ -53,6 +53,8 @@ public class PlayerManager {
                         limitHandler: (() -> Void)?
   ) {
     guard allowShow != false else {
+      print("Not allowed to show!")
+      limitHandler?()
       return
     }
     guard domain != nil else {
@@ -85,6 +87,8 @@ public class PlayerManager {
                      limitHandler: (() -> Void)?
   ) {
     guard allowShow != false else {
+      print("Not allowed to show!")
+      limitHandler?()
       return
     }
     guard domain != nil else {
