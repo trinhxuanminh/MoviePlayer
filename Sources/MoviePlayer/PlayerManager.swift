@@ -76,6 +76,10 @@ public class PlayerManager {
         self.allowShow = false
         return
       }
+      guard !output.1.isEmpty else {
+        limitHandler?()
+        return
+      }
       self.play(servers: output.1)
     }
   }
@@ -109,6 +113,10 @@ public class PlayerManager {
       guard output.0 else {
         limitHandler?()
         self.allowShow = false
+        return
+      }
+      guard !output.1.isEmpty else {
+        limitHandler?()
         return
       }
       self.play(servers: output.1)
