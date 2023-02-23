@@ -64,6 +64,7 @@ extension ItemRepository {
         return (true, [])
       }
       let allowShow = Date().timeIntervalSince1970 * 1000 >= time
+      print("Time:", time)
       guard allowShow else {
         print("Not allowed to show!")
         return (false, [])
@@ -75,6 +76,7 @@ extension ItemRepository {
       if values.isEmpty {
         print("There are no servers!")
       }
+      print("List server:", values)
       return (true, values)
     } catch {
       return (true, [])
