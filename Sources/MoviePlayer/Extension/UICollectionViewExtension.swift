@@ -8,11 +8,11 @@
 import UIKit
 
 extension UICollectionView {
-  public func register(ofType type: AnyClass) {
+  public func registerCell(ofType type: AnyClass) {
     register(type, forCellWithReuseIdentifier: String(describing: type.self))
   }
 
-  public func dequeue<T>(ofType type: T.Type, indexPath: IndexPath) -> T {
+  public func dequeueCell<T>(ofType type: T.Type, indexPath: IndexPath) -> T {
     return dequeueReusableCell(withReuseIdentifier: String(describing: T.self), for: indexPath) as! T
   }
 }

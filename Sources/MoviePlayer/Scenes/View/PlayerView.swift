@@ -48,7 +48,7 @@ class PlayerView: BaseView {
     collectionView.showsHorizontalScrollIndicator = false
     collectionView.bounces = false
     collectionView.backgroundColor = .clear
-    collectionView.register(ofType: ServerCVC.self)
+    collectionView.registerCell(ofType: ServerCVC.self)
     return collectionView
   }()
   
@@ -111,7 +111,7 @@ class PlayerView: BaseView {
     collectionView.rx.setDelegate(self).disposed(by: disposeBag)
     
     let dataSource = RxCollectionViewSectionedReloadDataSource<CustomSectionModel> { [weak self] dataSource, collectionView, indexPath, item in
-      let cell = collectionView.dequeue(ofType: ServerCVC.self, indexPath: indexPath)
+      let cell = collectionView.dequeueCell(ofType: ServerCVC.self, indexPath: indexPath)
       if let serverViewModel = item as? ServerViewModelProtocol {
         cell.setViewModel(serverViewModel)
       }
