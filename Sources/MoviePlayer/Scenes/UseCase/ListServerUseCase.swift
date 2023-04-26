@@ -12,7 +12,7 @@ protocol ListServerUseCaseProtocol {
   func loadMovieServer(name: String, tmdbId: Int, imdbId: String, completionHandler: @escaping ([ServerViewModelProtocol]) -> Void)
   func loadTVServer(name: String, season: Int, episode: Int, tmdbId: Int, completionHandler: @escaping ([ServerViewModelProtocol]) -> Void)
   func getTimePlay(completionHandler: @escaping (String?) -> Void)
-  func getTimeShowAds(completionHandler: @escaping (Int?) -> Void)
+  func getTimeShowAds(completionHandler: @escaping (String?) -> Void)
 }
 
 class ListServerUseCase: ListServerUseCaseProtocol {
@@ -42,7 +42,7 @@ class ListServerUseCase: ListServerUseCaseProtocol {
     itemRepository.getTimePlay(completionHandler: completionHandler)
   }
   
-  func getTimeShowAds(completionHandler: @escaping (Int?) -> Void) {
+  func getTimeShowAds(completionHandler: @escaping (String?) -> Void) {
     itemRepository.getTimeShowAds(completionHandler: completionHandler)
   }
 }

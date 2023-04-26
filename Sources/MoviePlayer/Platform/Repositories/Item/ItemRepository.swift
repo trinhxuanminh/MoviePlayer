@@ -14,7 +14,7 @@ import SwiftSoup
 protocol ItemRepositoryProtocol {
   func loadServer(input: ItemServerInput, completionHandler: @escaping ([Server]) -> Void)
   func getTimePlay(completionHandler: @escaping (String?) -> Void)
-  func getTimeShowAds(completionHandler: @escaping (Int?) -> Void)
+  func getTimeShowAds(completionHandler: @escaping (String?) -> Void)
 }
 
 class ItemRepository: APIService, ItemRepositoryProtocol {
@@ -48,9 +48,9 @@ class ItemRepository: APIService, ItemRepositoryProtocol {
     }
   }
   
-  func getTimeShowAds(completionHandler: @escaping (Int?) -> Void) {
+  func getTimeShowAds(completionHandler: @escaping (String?) -> Void) {
     request(ItemServerInput.getTimeShowAds) { output in
-      guard let output = output, let time = output["data"] as? Int else {
+      guard let output = output, let time = output["data"] as? String else {
         completionHandler(nil)
         return
       }

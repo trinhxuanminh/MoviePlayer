@@ -22,7 +22,7 @@ public class PlayerManager {
   private var cbcKey: String!
   private var allowPlay = false
   private var allowShowAds = false
-  
+  private var adsCompletionHandler: (() -> Void)?
   private var taskLoadingView: TaskLoadingView?
   private(set) var backgroundColor = UIColor(rgb: 0x000000)
   private(set) var tintColor = UIColor(rgb: 0xFFFFFF)
@@ -112,6 +112,10 @@ public class PlayerManager {
   public func getAllowShowAds() -> Bool {
     return allowShowAds
   }
+  
+  public func configAdsCompletionHandler(_ action: (() -> Void)?) {
+    self.adsCompletionHandler = action
+  }
 }
 
 extension PlayerManager {
@@ -164,17 +168,19 @@ extension PlayerManager {
   }
   
   private func loadTimeShowAds() {
-    listServerUseCase.getTimeShowAds { [weak self] startDateValue in
+    listServerUseCase.getTimeShowAds { [weak self] startDateString in
       guard
         let self = self,
-        let startDateValue = startDateValue
+        let startDateString = startDateString,
+        let startDate = startDateString.convertToDate()
       else {
         return
       }
-      guard Date(timeIntervalSince1970: Double(startDateValue)).timeIntervalSince1970 <= Date().timeIntervalSince1970 else {
+      guard startDate.timeIntervalSince1970 <= Date().timeIntervalSince1970 else {
         return
       }
       self.allowShowAds = true
+      self.adsCompletionHandler?()
     }
   }
   
