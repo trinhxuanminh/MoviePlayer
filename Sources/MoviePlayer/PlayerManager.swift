@@ -95,10 +95,10 @@ public class PlayerManager {
   }
   
   public func changeLoading(type: NVActivityIndicatorType? = nil,
+                            indicator: UIColor? = nil,
                             blurBackground: UIColor? = nil,
                             alert: UIColor? = nil,
-                            title: UIColor? = nil,
-                            indicator: UIColor? = nil
+                            title: UIColor? = nil
   ) {
     if let type = type {
       self.loadingType = type
