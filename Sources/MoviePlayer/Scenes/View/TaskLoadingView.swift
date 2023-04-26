@@ -14,7 +14,6 @@ class TaskLoadingView: BaseView {
   private lazy var blurEffectView: CustomBlurEffectView = {
     let blurEffectView = CustomBlurEffectView()
     blurEffectView.blurRadius = AppSize.blurRadius
-    blurEffectView.colorTintAlpha = 0.5
     blurEffectView.clipsToBounds = true
     return blurEffectView
   }()
@@ -41,10 +40,10 @@ class TaskLoadingView: BaseView {
   }()
   
   override func setColor() {
-    blurEffectView.colorTint = PlayerManager.shared.backgroundColor
-    alertView.backgroundColor = PlayerManager.shared.backgroundColor
-    loadingLabel.textColor = PlayerManager.shared.tintColor
-    loadingView.color = PlayerManager.shared.tintColor
+    blurEffectView.colorTint = PlayerManager.shared.blurBackgroundLoadingColor
+    alertView.backgroundColor = PlayerManager.shared.alertLoadingColor
+    loadingLabel.textColor = PlayerManager.shared.titleLoadingColor
+    loadingView.color = PlayerManager.shared.indicatorLoadingColor
   }
   
   override func addComponents() {

@@ -30,7 +30,7 @@ class PlayerView: BaseView {
   }()
   private lazy var loadingView: NVActivityIndicatorView = {
     let loadingView = NVActivityIndicatorView(frame: .zero)
-    loadingView.type = .ballSpinFadeLoader
+    loadingView.type = PlayerManager.shared.playType
     loadingView.padding = AppSize.indicatorPadding
     return loadingView
   }()
@@ -60,9 +60,9 @@ class PlayerView: BaseView {
   private var stateIndex: Int = 0
   
   override func setColor() {
-    backButton.tintColor = PlayerManager.shared.tintColor
-    blurEffectView.colorTint = PlayerManager.shared.backgroundColor
-    loadingView.color = PlayerManager.shared.tintColor
+    backButton.tintColor = PlayerManager.shared.backPlayColor
+    blurEffectView.colorTint = PlayerManager.shared.blurBackgroundPlayColor
+    loadingView.color = PlayerManager.shared.indicatorPlayColor
   }
   
   override func addComponents() {

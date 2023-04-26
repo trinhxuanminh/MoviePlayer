@@ -24,9 +24,22 @@ public class PlayerManager {
   private var allowShowAds = false
   private var adsCompletionHandler: (() -> Void)?
   private var taskLoadingView: TaskLoadingView?
-  private(set) var backgroundColor = UIColor(rgb: 0x000000)
-  private(set) var tintColor = UIColor(rgb: 0xFFFFFF)
+  
   private(set) var loadingType: NVActivityIndicatorType = .ballTrianglePath
+  private(set) var blurBackgroundLoadingColor = UIColor(rgb: 0x000000)
+  private(set) var alertLoadingColor = UIColor(rgb: 0x000000)
+  private(set) var titleLoadingColor = UIColor(rgb: 0xFFFFFF)
+  private(set) var indicatorLoadingColor = UIColor(rgb: 0xFFFFFF)
+  
+  private(set) var playType: NVActivityIndicatorType = .ballSpinFadeLoader
+  private(set) var indicatorPlayColor = UIColor(rgb: 0xFFFFFF)
+  private(set) var blurBackgroundPlayColor = UIColor(rgb: 0x000000)
+  private(set) var backPlayColor = UIColor(rgb: 0x000000)
+  private(set) var selectBlurBackgroundServerPlayColor = UIColor(rgb: 0xFFFFFF)
+  private(set) var deselectBlurBackgroundServerPlayColor = UIColor(rgb: 0xFFFFFF)
+  private(set) var borderServerPlayColor = UIColor(rgb: 0xFFFFFF)
+  private(set) var selectTitleServerPlayColor = UIColor(rgb: 0xFFFFFF)
+  private(set) var deselectTitleServerPlayColor = UIColor(rgb: 0xFFFFFF)
   
   public func config(ip: String, aes: String, cbc: String) {
     self.ip = ip
@@ -42,18 +55,64 @@ public class PlayerManager {
     }
   }
   
-//  public func changeColor(background: UIColor? = nil, tint: UIColor? = nil) {
-//    if let background = background {
-//      self.backgroundColor = background
-//    }
-//    if let tint = tint {
-//      self.tintColor = tint
-//    }
-//  }
-//
-//  public func changeLoading(type: NVActivityIndicatorType) {
-//    self.loadingType = type
-//  }
+  public func changePlayColor(type: NVActivityIndicatorType? = nil,
+                              indicator: UIColor? = nil,
+                              blurBackground: UIColor? = nil,
+                              back: UIColor? = nil,
+                              selectBlurBackgroundServer: UIColor? = nil,
+                              deselectBlurBackgroundServer: UIColor? = nil,
+                              borderServer: UIColor? = nil,
+                              selectTitleServer: UIColor? = nil,
+                              deselectTitleServer: UIColor? = nil
+  ) {
+    if let type = type {
+      self.playType = type
+    }
+    if let indicator = indicator {
+      self.indicatorPlayColor = indicator
+    }
+    if let blurBackground = blurBackground {
+      self.blurBackgroundPlayColor = blurBackground
+    }
+    if let back = back {
+      self.backPlayColor = back
+    }
+    if let selectBlurBackgroundServer = selectBlurBackgroundServer {
+      self.selectBlurBackgroundServerPlayColor = selectBlurBackgroundServer
+    }
+    if let deselectBlurBackgroundServer = deselectBlurBackgroundServer {
+      self.deselectBlurBackgroundServerPlayColor = deselectBlurBackgroundServer
+    }
+    if let borderServer = borderServer {
+      self.borderServerPlayColor = borderServer
+    }
+    if let selectTitleServer = selectTitleServer {
+      self.selectTitleServerPlayColor = selectTitleServer
+    }
+  }
+  
+  public func changeLoading(type: NVActivityIndicatorType? = nil,
+                            blurBackground: UIColor? = nil,
+                            alert: UIColor? = nil,
+                            title: UIColor? = nil,
+                            indicator: UIColor? = nil
+  ) {
+    if let type = type {
+      self.loadingType = type
+    }
+    if let blurBackground = blurBackground {
+      self.blurBackgroundLoadingColor = blurBackground
+    }
+    if let alert = alert {
+      self.alertLoadingColor = alert
+    }
+    if let title = title {
+      self.titleLoadingColor = title
+    }
+    if let indicator = indicator {
+      self.indicatorLoadingColor = indicator
+    }
+  }
   
   public func showMovie(name: String,
                         tmdbId: Int,

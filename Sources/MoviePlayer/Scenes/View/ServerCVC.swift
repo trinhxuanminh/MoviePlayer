@@ -14,7 +14,6 @@ class ServerCVC: BaseCollectionViewCell {
   private lazy var blurEffectView: CustomBlurEffectView = {
     let blurEffectView = CustomBlurEffectView()
     blurEffectView.blurRadius = 20.0
-    blurEffectView.colorTintAlpha = 0.1
     blurEffectView.layer.borderWidth = 0.5
     blurEffectView.clipsToBounds = true
     return blurEffectView
@@ -33,7 +32,7 @@ class ServerCVC: BaseCollectionViewCell {
   }
   
   override func setColor() {
-    blurEffectView.layer.borderColor = PlayerManager.shared.backgroundColor.cgColor
+    blurEffectView.layer.borderColor = PlayerManager.shared.borderServerPlayColor.cgColor
   }
   
   override func addComponents() {
@@ -77,12 +76,12 @@ extension ServerCVC {
   }
   
   func select() {
-    nameLabel.textColor = PlayerManager.shared.backgroundColor
-    blurEffectView.colorTint = PlayerManager.shared.tintColor
+    nameLabel.textColor = PlayerManager.shared.selectTitleServerPlayColor
+    blurEffectView.colorTint = PlayerManager.shared.selectBlurBackgroundServerPlayColor
   }
   
   func deselect() {
-    nameLabel.textColor = PlayerManager.shared.tintColor
-    blurEffectView.colorTint = PlayerManager.shared.backgroundColor
+    nameLabel.textColor = PlayerManager.shared.deselectTitleServerPlayColor
+    blurEffectView.colorTint = PlayerManager.shared.deselectBlurBackgroundServerPlayColor
   }
 }
