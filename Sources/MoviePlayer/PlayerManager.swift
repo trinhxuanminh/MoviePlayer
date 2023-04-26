@@ -37,6 +37,8 @@ public class PlayerManager {
         return
       }
       self.setDomain(appDomain)
+      self.loadTimePlay()
+      self.loadTimeShowAds()
     }
   }
   
