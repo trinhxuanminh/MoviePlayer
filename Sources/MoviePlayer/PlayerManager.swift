@@ -89,6 +89,9 @@ public class PlayerManager {
     if let selectTitleServer = selectTitleServer {
       self.selectTitleServerPlayColor = selectTitleServer
     }
+    if let deselectTitleServer = deselectTitleServer {
+      self.deselectTitleServerPlayColor = deselectTitleServer
+    }
   }
   
   public func changeLoading(type: NVActivityIndicatorType? = nil,
