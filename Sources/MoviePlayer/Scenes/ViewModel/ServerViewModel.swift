@@ -13,8 +13,8 @@ protocol ServerViewModelProtocol {
   var name: BehaviorRelay<String?> { get }
   var link: BehaviorRelay<String?> { get }
   
-  func setServer(_ server: (name: String, link: String))
-  func getServer() -> (name: String, link: String)?
+  func setServer(_ server: Server)
+  func getServer() -> Server?
 }
 
 class ServerViewModel: ServerViewModelProtocol {
@@ -26,17 +26,17 @@ class ServerViewModel: ServerViewModelProtocol {
   private(set) var name = BehaviorRelay<String?>(value: nil)
   private(set) var link = BehaviorRelay<String?>(value: nil)
   
-  private var server = BehaviorRelay<(name: String, link: String)?>(value: nil)
+  private var server = BehaviorRelay<Server?>(value: nil)
   
   init() {
     binding()
   }
   
-  func setServer(_ server: (name: String, link: String)) {
+  func setServer(_ server: Server) {
     self.server.accept(server)
   }
   
-  func getServer() -> (name: String, link: String)? {
+  func getServer() -> Server? {
     return server.value
   }
   

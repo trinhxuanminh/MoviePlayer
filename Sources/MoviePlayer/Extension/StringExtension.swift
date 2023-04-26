@@ -8,6 +8,12 @@
 import UIKit
 
 public extension String {
+  func convertToDate() -> Date? {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    return dateFormatter.date(from: self)
+  }
+  
   func heightText(width: CGFloat, font: UIFont) -> CGFloat {
     let maxSize = CGSize(width: width, height: CGFloat(MAXFLOAT))
     let text: String = self

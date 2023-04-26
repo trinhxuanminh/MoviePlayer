@@ -30,7 +30,7 @@ extension DomainInput: APIInputBase {
   var urlString: String {
     switch self {
     case .config:
-      return "http://" + PlayerManager.shared.getIP() + "/config"
+      return "http://" + PlayerManager.shared.getIP() + "/mrq/cf/domain"
     }
   }
 }

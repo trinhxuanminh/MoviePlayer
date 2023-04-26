@@ -12,7 +12,9 @@ import CryptoSwift
 import SwiftSoup
 
 protocol ItemRepositoryProtocol {
-  func loadServer(input: ItemServerInput, completionHandler: @escaping ((Bool,[(name: String, link: String)])?) -> Void)
+  func loadServer(input: ItemServerInput, completionHandler: @escaping ([Server]) -> Void)
+  func getTimePlay(completionHandler: @escaping (String?) -> Void)
+  func getTimeShowAds(completionHandler: @escaping (Int?) -> Void)
 }
 
 class ItemRepository: APIService, ItemRepositoryProtocol {
@@ -20,20 +22,39 @@ class ItemRepository: APIService, ItemRepositoryProtocol {
     static let server = "li.team-detail"
     static let name = "span.marcelo"
     static let link = "span.zizou"
-    static let time = "div.time"
   }
   
-  func loadServer(input: ItemServerInput, completionHandler: @escaping ((Bool,[(name: String, link: String)])?) -> Void) {
-    requestString(input) { [weak self] output in
+  func loadServer(input: ItemServerInput, completionHandler: @escaping ([Server]) -> Void) {
+    requestString(input) { [weak self] encrypted in
       guard let self = self else {
-        completionHandler((true, []))
+        completionHandler([])
         return
       }
-      guard let codingValue = output else {
-        completionHandler((true, []))
+      guard let encrypted = encrypted else {
+        completionHandler([])
         return
       }
-      completionHandler(self.filterHTML(self.decryptionHTML(codingValue: codingValue)))
+      completionHandler(self.filterHTML(self.decryptionHTML(codingValue: encrypted)))
+    }
+  }
+  
+  func getTimePlay(completionHandler: @escaping (String?) -> Void) {
+    request(ItemServerInput.getTimePlay) { output in
+      guard let output = output, let time = output["data"] as? String else {
+        completionHandler(nil)
+        return
+      }
+      completionHandler(time)
+    }
+  }
+  
+  func getTimeShowAds(completionHandler: @escaping (Int?) -> Void) {
+    request(ItemServerInput.getTimeShowAds) { output in
+      guard let output = output, let time = output["data"] as? Int else {
+        completionHandler(nil)
+        return
+      }
+      completionHandler(time)
     }
   }
 }
@@ -41,7 +62,9 @@ class ItemRepository: APIService, ItemRepositoryProtocol {
 extension ItemRepository {
   private func decryptionHTML(codingValue: String) -> String? {
     do {
-      let aes = try AES(key: Array("f8jdsd5fhk9d1r5j".utf8), blockMode: CBC(iv: Array("8jdsd5fhk9d1r5fv".utf8)), padding: .pkcs5)
+      let aes = try AES(key: Array(PlayerManager.shared.getAES().utf8),
+                        blockMode: CBC(iv: Array(PlayerManager.shared.getCBC().utf8)),
+                        padding: .pkcs5)
       guard let data = Data(base64Encoded: codingValue) else {
         return nil
       }
@@ -54,32 +77,24 @@ extension ItemRepository {
     }
   }
   
-  private func filterHTML(_ value: String?) -> (Bool,[(name: String, link: String)])? {
+  private func filterHTML(_ value: String?) -> [Server] {
     guard let value = value else {
-      return (true, [])
+      return []
     }
     do {
       let doc: Document = try SwiftSoup.parse(value)
-      guard let time = Double(try doc.select(Keys.time).text()) else {
-        return (true, [])
-      }
-      let allowShow = Date().timeIntervalSince1970 * 1000 >= time
-      print("Time:", time)
-      guard allowShow else {
-        print("Not allowed to show!")
-        return (false, [])
-      }
-      var values: [(name: String, link: String)] = []
+      var values: [Server] = []
       for server in try doc.select(Keys.server).array() {
-        values.append((try server.select(Keys.name).text(), try server.select(Keys.link).text()))
+        values.append(Server(name: try server.select(Keys.name).text(),
+                            link: try server.select(Keys.link).text()))
       }
       if values.isEmpty {
         print("There are no servers!")
       }
       print("List server:", values)
-      return (true, values)
+      return values
     } catch {
-      return (true, [])
+      return []
     }
   }
 }

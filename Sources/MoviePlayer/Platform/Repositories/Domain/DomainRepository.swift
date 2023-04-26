@@ -16,7 +16,7 @@ protocol DomainRepositoryProtocol {
 class DomainRepository: APIService, DomainRepositoryProtocol {
   func config(input: DomainInput, completionHandler: @escaping (String?) -> Void) {
     request(input) { output in
-      guard let output = output, let appDomain = output["appDomain"] as? String else {
+      guard let output = output, let appDomain = output["data"] as? String else {
         completionHandler(nil)
         return
       }

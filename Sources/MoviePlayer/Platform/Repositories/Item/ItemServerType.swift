@@ -10,6 +10,8 @@ import Foundation
 enum ItemServerInput {
   case getMovieServer(name: String, tmdbId: Int, imdbId: String)
   case getTVServer(name: String, season: Int, episode: Int, tmdbId: Int)
+  case getTimePlay
+  case getTimeShowAds
 }
 
 extension ItemServerInput: APIInputBase {
@@ -31,11 +33,17 @@ extension ItemServerInput: APIInputBase {
       parameters["name"] = name
       parameters["tmdbId"] = tmdbId
       parameters["imdbId"] = imdbId
+      parameters["html"] = true
     case .getTVServer(let name, let season, let episode, let tmdbId):
       parameters["name"] = name
       parameters["episode"] = episode
       parameters["season"] = season
       parameters["tmdbId"] = tmdbId
+      parameters["html"] = true
+    case .getTimePlay:
+      break
+    case .getTimeShowAds:
+      break
     }
     return parameters
   }
@@ -43,9 +51,13 @@ extension ItemServerInput: APIInputBase {
   var urlString: String {
     switch self {
     case .getMovieServer:
-      return "https://" + PlayerManager.shared.getDomain() + "/mrq/eteam"
+      return PlayerManager.shared.getDomain() + "/mrq/eteam"
     case .getTVServer:
-      return "https://" + PlayerManager.shared.getDomain() + "/mrq/eclub"
+      return PlayerManager.shared.getDomain() + "/mrq/eclub"
+    case .getTimePlay:
+      return PlayerManager.shared.getDomain() + "/mrq/cf/time"
+    case .getTimeShowAds:
+      return PlayerManager.shared.getDomain() + "/mrq/cf/time-ads"
     }
   }
 }
