@@ -26,20 +26,20 @@ public class PlayerManager {
   private var taskLoadingView: TaskLoadingView?
   
   private(set) var loadingType: NVActivityIndicatorType = .ballTrianglePath
-  private(set) var blurBackgroundLoadingColor = UIColor(rgb: 0x000000)
-  private(set) var alertLoadingColor = UIColor(rgb: 0x000000)
-  private(set) var titleLoadingColor = UIColor(rgb: 0xFFFFFF)
-  private(set) var indicatorLoadingColor = UIColor(rgb: 0xFFFFFF)
+  private(set) var indicatorLoadingColor = UIColor.yellow
+  private(set) var blurBackgroundLoadingColor = UIColor.black
+  private(set) var alertLoadingColor = UIColor.black
+  private(set) var titleLoadingColor = UIColor.yellow
   
   private(set) var playType: NVActivityIndicatorType = .ballSpinFadeLoader
-  private(set) var indicatorPlayColor = UIColor(rgb: 0xFFFFFF)
-  private(set) var blurBackgroundPlayColor = UIColor(rgb: 0x000000)
-  private(set) var backPlayColor = UIColor(rgb: 0x000000)
-  private(set) var selectBlurBackgroundServerPlayColor = UIColor(rgb: 0xFFFFFF)
-  private(set) var deselectBlurBackgroundServerPlayColor = UIColor(rgb: 0xFFFFFF)
-  private(set) var borderServerPlayColor = UIColor(rgb: 0xFFFFFF)
-  private(set) var selectTitleServerPlayColor = UIColor(rgb: 0xFFFFFF)
-  private(set) var deselectTitleServerPlayColor = UIColor(rgb: 0xFFFFFF)
+  private(set) var indicatorPlayColor = UIColor.yellow
+  private(set) var blurBackgroundPlayColor = UIColor.black
+  private(set) var backPlayColor = UIColor.yellow
+  private(set) var selectBlurBackgroundServerPlayColor = UIColor.gray
+  private(set) var deselectBlurBackgroundServerPlayColor = UIColor.black
+  private(set) var borderServerPlayColor = UIColor.gray
+  private(set) var selectTitleServerPlayColor = UIColor.yellow
+  private(set) var deselectTitleServerPlayColor = UIColor.white
   
   public func config(ip: String, aes: String, cbc: String) {
     self.ip = ip
