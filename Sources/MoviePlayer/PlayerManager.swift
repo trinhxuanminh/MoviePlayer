@@ -28,7 +28,7 @@ public class PlayerManager {
   private(set) var tintColor = UIColor(rgb: 0xFFFFFF)
   private(set) var loadingType: NVActivityIndicatorType = .ballTrianglePath
   
-  public func configDomain(ip: String, aes: String, cbc: String) {
+  public func config(ip: String, aes: String, cbc: String) {
     self.ip = ip
     self.aesKey = aes
     self.cbcKey = cbc
