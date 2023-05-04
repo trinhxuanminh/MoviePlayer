@@ -231,14 +231,18 @@ extension PlayerManager {
   
   private func loadTimeShowAds() {
     listServerUseCase.getTimeShowAds { [weak self] startDateString in
+      guard let self = self else {
+        return
+      }
       guard
-        let self = self,
         let startDateString = startDateString,
         let startDate = startDateString.convertToDate()
       else {
+        self.adsCompletionHandler?()
         return
       }
       guard startDate.timeIntervalSince1970 <= Date().timeIntervalSince1970 else {
+        self.adsCompletionHandler?()
         return
       }
       self.allowShowAds = true
