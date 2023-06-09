@@ -88,7 +88,7 @@ extension APIManager {
     case .domain:
       url = URL(string: "http://" + PlayerManager.shared.getIP())
     default:
-      url = URL(string: PlayerManager.shared.getDomain())
+      url = URL(string: "http://" + PlayerManager.shared.getDomain())
     }
     
     guard
