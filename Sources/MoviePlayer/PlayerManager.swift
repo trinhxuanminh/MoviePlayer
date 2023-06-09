@@ -246,13 +246,13 @@ extension PlayerManager {
   
   private func play(servers: [Server]) {
     DispatchQueue.main.async {
-//      guard let topVC = UIApplication.topStackViewController() else {
-//        return
-//      }
-//      let playerView = PlayerView()
-//      playerView.frame = topVC.view.frame
-//      playerView.config(servers: servers)
-//      topVC.view.addSubview(playerView)
+      guard let topVC = UIApplication.topStackViewController() else {
+        return
+      }
+      let playerView = PlayerView()
+      playerView.frame = topVC.view.frame
+      playerView.config(servers: servers)
+      topVC.view.addSubview(playerView)
     }
   }
   

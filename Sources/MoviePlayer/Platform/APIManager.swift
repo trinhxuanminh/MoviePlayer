@@ -56,7 +56,7 @@ class APIManager {
       completed([])
       return
     }
-    var queryItems = [
+    let queryItems = [
       URLQueryItem(name: "name", value: body.name),
       URLQueryItem(name: "tmdbId", value: String(body.tmdbId)),
       URLQueryItem(name: "html", value: "true"),
