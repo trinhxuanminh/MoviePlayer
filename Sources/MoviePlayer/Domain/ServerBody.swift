@@ -11,7 +11,6 @@ struct ServerBody: Codable {
   let name: String
   let tmdbId: Int
   let imdbId: String?
-  var html: Bool = true
   let season: Int?
   let episode: Int?
 }

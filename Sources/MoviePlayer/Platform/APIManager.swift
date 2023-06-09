@@ -27,7 +27,7 @@ class APIManager {
   }
   
   func getConfig(input: Input, completed: @escaping (ConfigResponse?) -> Void) {
-    guard let request = prepareRequest(input: input, body: nil) else {
+    guard let request = prepareRequest(input: input, queryItems: nil) else {
       completed(nil)
       return
     }
@@ -56,8 +56,15 @@ class APIManager {
       completed([])
       return
     }
-    
-    guard let request = prepareRequest(input: input, body: body) else {
+    var queryItems = [
+      URLQueryItem(name: "name", value: body.name),
+      URLQueryItem(name: "tmdbId", value: String(body.tmdbId)),
+      URLQueryItem(name: "html", value: "true"),
+      URLQueryItem(name: "imdbId", value: body.imdbId),
+      URLQueryItem(name: "season", value: String(body.season ?? 0)),
+      URLQueryItem(name: "episode", value: String(body.episode ?? 0))
+    ]
+    guard let request = prepareRequest(input: input, queryItems: queryItems) else {
       completed([])
       return
     }
@@ -82,7 +89,7 @@ class APIManager {
 }
 
 extension APIManager {
-  private func prepareRequest(input: Input, body: ServerBody?) -> URLRequest? {
+  private func prepareRequest(input: Input, queryItems: [URLQueryItem]?) -> URLRequest? {
     var url: URL?
     switch input {
     case .domain:
@@ -111,6 +118,10 @@ extension APIManager {
       urlComponents.path = "/mrq/cf/time"
     }
     
+    if let queryItems = queryItems {
+      urlComponents.queryItems = queryItems
+    }
+    
     guard let urlRequest = urlComponents.url else {
       return nil
     }
@@ -118,13 +129,6 @@ extension APIManager {
     request.httpMethod = "GET"
     request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
     request.setValue("application/json", forHTTPHeaderField: "Accept")
-    
-    if let body = body {
-      let encoder = JSONEncoder()
-      if let encoded = try? encoder.encode(body) {
-        request.httpBody = encoded
-      }
-    }
     
     return request
   }
