@@ -6,23 +6,20 @@
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
 import NVActivityIndicatorView
+
+public typealias Handler = (() -> Void)
 
 public class PlayerManager {
   public static var shared = PlayerManager()
   
-  private let disposeBag = DisposeBag()
-  private let listServerUseCase = ListServerUseCase()
-  private let domainUseCase = DomainUseCase()
   private var domain: String!
   private var ip: String!
   private var aesKey: String!
   private var cbcKey: String!
   private var allowPlay = false
   private var allowShowAds = false
-  private var adsCompletionHandler: (() -> Void)?
+  private var adsCompletionHandler: Handler?
   private var taskLoadingView: TaskLoadingView?
   
   private(set) var loadingType: NVActivityIndicatorType = .ballTrianglePath
@@ -45,11 +42,15 @@ public class PlayerManager {
     self.ip = ip
     self.aesKey = aes
     self.cbcKey = cbc
-    domainUseCase.config { [weak self] appDomain in
-      guard let self = self, let appDomain = appDomain else {
+    
+    APIManager.shared.getConfig(input: .domain) { [weak self] configResponse in
+      guard let self = self else {
         return
       }
-      self.setDomain(appDomain)
+      guard let configResponse = configResponse else {
+        return
+      }
+      self.setDomain(configResponse.data)
       self.loadTimePlay()
       self.loadTimeShowAds()
     }
@@ -120,62 +121,37 @@ public class PlayerManager {
   public func showMovie(name: String,
                         tmdbId: Int,
                         imdbId: String,
-                        limitHandler: (() -> Void)?
+                        limitHandler: Handler?
   ) {
     guard allowLoad() else {
       limitHandler?()
       return
     }
     startTaskLoading()
-    listServerUseCase.loadMovieServer(name: name,
-                                      tmdbId: tmdbId,
-                                      imdbId: imdbId) { [weak self] output in
-      guard let self = self else {
-        limitHandler?()
-        return
-      }
-      self.stopTaskLoading()
-      guard !output.isEmpty else {
-        limitHandler?()
-        return
-      }
-      self.play(servers: output)
-    }
+    let body = ServerBody(name: name, tmdbId: tmdbId, imdbId: imdbId, season: nil, episode: nil)
+    loadServer(input: .movie, body: body, limitHandler: limitHandler)
   }
   
   public func showTV(name: String,
                      season: Int,
                      episode: Int,
                      tmdbId: Int,
-                     limitHandler: (() -> Void)?
+                     limitHandler: Handler?
   ) {
     guard allowLoad() else {
       limitHandler?()
       return
     }
     startTaskLoading()
-    listServerUseCase.loadTVServer(name: name,
-                                   season: season,
-                                   episode: episode,
-                                   tmdbId: tmdbId) { [weak self] output in
-      guard let self = self else {
-        limitHandler?()
-        return
-      }
-      self.stopTaskLoading()
-      guard !output.isEmpty else {
-        limitHandler?()
-        return
-      }
-      self.play(servers: output)
-    }
+    let body = ServerBody(name: name, tmdbId: tmdbId, imdbId: nil, season: season, episode: episode)
+    loadServer(input: .movie, body: body, limitHandler: limitHandler)
   }
   
   public func getAllowShowAds() -> Bool {
     return allowShowAds
   }
   
-  public func configAdsCompletionHandler(_ action: (() -> Void)?) {
+  public func configAdsCompletionHandler(_ action: Handler?) {
     self.adsCompletionHandler = action
   }
 }
@@ -213,12 +189,30 @@ extension PlayerManager {
     return true
   }
   
+  private func loadServer(input: APIManager.Input, body: ServerBody, limitHandler: Handler?) {
+    APIManager.shared.getServer(input: input,
+                                body: body) { [weak self] servers in
+      guard let self = self else {
+        limitHandler?()
+        return
+      }
+      self.stopTaskLoading()
+      guard !servers.isEmpty else {
+        limitHandler?()
+        return
+      }
+      self.play(servers: servers)
+    }
+  }
+  
   private func loadTimePlay() {
-    listServerUseCase.getTimePlay { [weak self] startDateString in
+    APIManager.shared.getConfig(input: .timePlay) { [weak self] configResponse in
+      guard let self = self else {
+        return
+      }
       guard
-        let self = self,
-        let startDateString = startDateString,
-        let startDate = startDateString.convertToDate()
+        let configResponse = configResponse,
+        let startDate = configResponse.data.convertToDate()
       else {
         return
       }
@@ -230,13 +224,13 @@ extension PlayerManager {
   }
   
   private func loadTimeShowAds() {
-    listServerUseCase.getTimeShowAds { [weak self] startDateString in
+    APIManager.shared.getConfig(input: .timeAds) { [weak self] configResponse in
       guard let self = self else {
         return
       }
       guard
-        let startDateString = startDateString,
-        let startDate = startDateString.convertToDate()
+        let configResponse = configResponse,
+        let startDate = configResponse.data.convertToDate()
       else {
         self.adsCompletionHandler?()
         return
@@ -250,17 +244,15 @@ extension PlayerManager {
     }
   }
   
-  private func play(servers: [ServerViewModelProtocol]) {
+  private func play(servers: [Server]) {
     DispatchQueue.main.async {
-      guard let topVC = UIApplication.topStackViewController() else {
-        return
-      }
-      let playerView = PlayerView()
-      playerView.frame = topVC.view.frame
-      let listServerViewModel = ListServerViewModel()
-      listServerViewModel.setListServer(servers)
-      playerView.setViewModel(listServerViewModel)
-      topVC.view.addSubview(playerView)
+//      guard let topVC = UIApplication.topStackViewController() else {
+//        return
+//      }
+//      let playerView = PlayerView()
+//      playerView.frame = topVC.view.frame
+//      playerView.config(servers: servers)
+//      topVC.view.addSubview(playerView)
     }
   }
   
@@ -279,7 +271,7 @@ extension PlayerManager {
       self.taskLoadingView = taskLoadingView
     }
   }
-
+  
   private func stopTaskLoading() {
     DispatchQueue.main.async { [weak self] in
       guard let self = self else {

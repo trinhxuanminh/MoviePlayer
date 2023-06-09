@@ -6,11 +6,8 @@
 //
 
 import UIKit
-import RxSwift
 
 class BaseCollectionViewCell: UICollectionViewCell, ViewProtocol {
-  let disposeBag = DisposeBag()
-  
   override init(frame: CGRect) {
     super.init(frame: frame)
     addComponents()

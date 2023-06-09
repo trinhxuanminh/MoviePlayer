@@ -14,10 +14,7 @@ let package = Package(
     ], dependencies: [
       // Dependencies declare other packages that this package depends on.
       // .package(url: /* package url */, from: "1.0.0"),
-      .package(url: "https://github.com/ReactiveX/RxSwift", from: "6.5.0"),
       .package(url: "https://github.com/ninjaprox/NVActivityIndicatorView", from: "5.1.1"),
-      .package(url: "https://github.com/RxSwiftCommunity/RxDataSources", from: "5.0.2"),
-      .package(url: "https://github.com/RxSwiftCommunity/Action", from: "5.0.0"),
       .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.6.0"),
       .package(url: "https://github.com/krzyzanowskim/CryptoSwift", from: "1.6.0"),
       .package(url: "https://github.com/scinfu/SwiftSoup", from: "2.4.3"),
@@ -28,10 +25,7 @@ let package = Package(
       .target(
         name: "MoviePlayer",
         dependencies: [
-          "RxSwift",
           "NVActivityIndicatorView",
-          "RxDataSources",
-          "Action",
           "SnapKit",
           "CryptoSwift",
           "SwiftSoup",
